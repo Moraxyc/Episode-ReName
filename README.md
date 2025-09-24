@@ -15,9 +15,14 @@
 Manager 等软件刮削数据使用. 也可以配合qbitorrent下载文件后自动重命名,
 具体使用方法请看下面的说明.
 
+# Fork修改
+
+1. 标准化了python项目，使用uv管理包和环境
+2. 移除了pyinstaller
+
 # ⚠️ 注意
 
-注意0: 本工具是**命令行**工具, 没有界面, 没有界面, 没有界面, 不要问我为什么双击exe没有反应!
+注意0: 本工具是**命令行**工具, 没有界面, 没有界面, 没有界面!
 
 注意1: 需要重命名的文件必须在类似 `Season 1`, `s1` 的目录中才会被处理. 这样设置是为了防止误操作.
 
@@ -30,27 +35,26 @@ Manager 等软件刮削数据使用. 也可以配合qbitorrent下载文件后自
 
 <!--ts-->
 
-* [Episode-ReName](#-episode-rename)
-* [注意](#️-注意)
-* [目录](#-目录)
-* [使用场景1 - 右键菜单调用](#使用场景1----右键菜单调用)
-* [使用场景2 - windows的qbitorrent下载后自动重命名](#使用场景2----windows的qbitorrent下载后自动重命名)
-* [使用场景3 - 群晖套件版qbittorrent下载后自动重命名](#使用场景3----群晖套件版qbittorrent下载后自动重命名)
-* [使用场景4 - docker版qbittorrent下载后自动重命名](#使用场景4----docker版qbittorrent下载后自动重命名)
-* [使用场景5 - windows命令行运行](#使用场景5----windows命令行运行)
-   * [简易参数模式](#-简易参数模式)
-   * [复杂参数模式](#-复杂参数模式)
-* [使用场景6 - Linux终端运行](#使用场景6----linux终端运行)
-* [脚本编译成可执行程序](#️-脚本编译成可执行程序)
-* [强制的规范元数据结构](#-强制的规范元数据结构)
-* [工具主要功能和处理逻辑](#️-工具主要功能和处理逻辑)
-* [主要文件说明](#-主要文件说明)
-   * [处理带有数字的剧集名称](#-处理带有数字的剧集名称)
-* [多季番剧tmdb集数适配](#-多季番剧tmdb集数适配)
-* [Stargazers 数据](#-stargazers-数据)
-* [捐赠](#-捐赠)
-* [感谢](#-感谢)
-
+- [Episode-ReName](#-episode-rename)
+- [注意](#️-注意)
+- [目录](#-目录)
+- [使用场景1 - 右键菜单调用](#使用场景1----右键菜单调用)
+- [使用场景2 - windows的qbitorrent下载后自动重命名](#使用场景2----windows的qbitorrent下载后自动重命名)
+- [使用场景3 - 群晖套件版qbittorrent下载后自动重命名](#使用场景3----群晖套件版qbittorrent下载后自动重命名)
+- [使用场景4 - docker版qbittorrent下载后自动重命名](#使用场景4----docker版qbittorrent下载后自动重命名)
+- [使用场景5 - windows命令行运行](#使用场景5----windows命令行运行)
+  - [简易参数模式](#-简易参数模式)
+  - [复杂参数模式](#-复杂参数模式)
+- [使用场景6 - Linux终端运行](#使用场景6----linux终端运行)
+- [脚本编译成可执行程序](#️-脚本编译成可执行程序)
+- [强制的规范元数据结构](#-强制的规范元数据结构)
+- [工具主要功能和处理逻辑](#️-工具主要功能和处理逻辑)
+- [主要文件说明](#-主要文件说明)
+  - [处理带有数字的剧集名称](#-处理带有数字的剧集名称)
+- [多季番剧tmdb集数适配](#-多季番剧tmdb集数适配)
+- [Stargazers 数据](#-stargazers-数据)
+- [捐赠](#-捐赠)
+- [感谢](#-感谢)
 
 <!--te-->
 
@@ -89,7 +93,6 @@ D:\Test\EpisodeReName.exe --path "%F" --delay 15 --overwrite 1 --use_folder_as_s
 - --delay 这个数字是执行延时, 单位是秒, 因为qb下载完成会锁住文件, 需要等一段时间来让它释放, 时间长短可自行调整。
 - --overwrite 1 是强制重命名。
 - --use_folder_as_season 是根据路径获取季数。
-
 
 如果重命名遇到问题，需要更详细的日志输出来定位问题，可以添加日志参数：
 
@@ -130,16 +133,19 @@ D:\Test\EpisodeReName.exe --path "%F" --delay 15 --overwrite 1 --use_folder_as_s
    下面填上
 
    群晖7.2的python3命令不需要输入完整路径，可直接使用：
+
    ```
    python3 /volume1/docker/EpisodeRename/EpisodeReName.py --path "%F" --delay 15 --overwrite 1
    ```
 
    如果您安装了特定版本的Python套件（如python3.11），也可以使用：
+
    ```
    /usr/local/bin/python3.11 /volume1/docker/EpisodeRename/EpisodeReName.py --path "%F" --delay 30 --overwrite 1
    ```
 
    如需更详细的日志输出，可以添加日志参数：
+
    ```
    python3 /volume1/docker/EpisodeRename/EpisodeReName.py --path "%F" --delay 15 --overwrite 1 --log_to_file 1 --log_level DEBUG
    ```
@@ -310,30 +316,6 @@ python3 -m pip install -r requirements.txt --user
 python3 EpisodeReName.py "/home/user/我的番剧/XXX/Season 1"
 ```
 
-# 🛠️ 脚本编译成可执行程序
-
-如果你想自己将python脚本打包成exe, 需要python3运行环境.
-
-安装[pyinstaller](https://github.com/pyinstaller/pyinstaller)模块.
-
-可以使用以下命令来安装相关模块
-
-```
-pip3 install -r requirements.txt
-```
-
-将脚本打包成可执行程序
-
-```
-pyinstaller -F EpisodeReName.py
-```
-
-将脚本打包成可执行程序 (不带启动黑框)
-
-```
-pyinstaller -F -w EpisodeReName.py
-```
-
 # 📜 强制的规范元数据结构
 
 1. 剧季文件夹：Season1 / Season 1 / s1 / S1
@@ -359,8 +341,6 @@ pyinstaller -F -w EpisodeReName.py
 `EpisodeReName.py` 重命名工具主程序
 
 `utils` 工具类
-
-`make_exe.bat` 将python脚本打包成exe, 依赖[pyinstaller](https://github.com/pyinstaller/pyinstaller)模块
 
 ## 🚩 处理带有数字的剧集名称
 

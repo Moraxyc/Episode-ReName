@@ -1,5 +1,5 @@
 [project]
-name = "episode-rename"
+name = "EpisodeReName"
 version = "1.4.1"
 description = """
 电视剧/番剧自动化重命名工具, 一键批量改名

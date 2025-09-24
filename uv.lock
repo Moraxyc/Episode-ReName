@@ -12,7 +12,7 @@ wheels = [
 ]
 
 [[package]]
-name = "episode-rename"
+name = "episoderename"
 version = "1.4.1"
 source = { editable = "." }
 dependencies = [
