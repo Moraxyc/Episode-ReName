@@ -101,6 +101,7 @@ if len(sys.argv) > 1 and not sys.argv[1].startswith('-'):
     log_to_file = 0  # 默认关闭日志文件输出
     log_level = 'INFO'  # 默认日志等级
     library_path = ""
+    require_prefix = ""
 else:
     # 新的argparse解析
     # python EpisodeReName.py --path E:\test\极端试验样本\S1 --delay 1 --overwrite 1
@@ -215,6 +216,13 @@ else:
         type=str,
         default="",
     )
+    ap.add_argument(
+        '--require_prefix',
+        required=False,
+        help='要求target_path必须具备的前缀，可以用于限制qb重命名对象',
+        type=str,
+        default="",
+    )
 
     args = vars(ap.parse_args())
     target_path = args['path']
@@ -233,6 +241,7 @@ else:
     log_to_file = args['log_to_file']
     log_level = args['log_level']
     library_path = args['library_path']
+    require_prefix = args['require_prefix']
 
     if parse_resolution:
         name_format = 'S{season}E{ep} - {resolution}'
@@ -281,6 +290,10 @@ logger.info(f"工作目录: {application_path}")
 
 if not target_path:
     # 没有路径参数直接退出
+    sys.exit()
+
+if not target_path.startswith(require_prefix):
+    logger.info("不在允许路径下！")
     sys.exit()
 
 # 除samba格式的路径外 其它格式的路径斜杠统一处理
