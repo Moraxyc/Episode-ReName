@@ -4,6 +4,7 @@ import platform
 import re
 import sys
 import time
+from ast import arg
 from datetime import datetime
 
 from .custom_rules import starts_with_rules
@@ -99,6 +100,7 @@ if len(sys.argv) > 1 and not sys.argv[1].startswith('-'):
     ignore_file_count_check = 0
     log_to_file = 0  # 默认关闭日志文件输出
     log_level = 'INFO'  # 默认日志等级
+    library_path = ""
 else:
     # 新的argparse解析
     # python EpisodeReName.py --path E:\test\极端试验样本\S1 --delay 1 --overwrite 1
@@ -206,6 +208,13 @@ else:
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
         default='INFO',
     )
+    ap.add_argument(
+        '--library_path',
+        required=False,
+        help='指定重命名到新的路径',
+        type=str,
+        default="",
+    )
 
     args = vars(ap.parse_args())
     target_path = args['path']
@@ -223,6 +232,7 @@ else:
     rename_interval = args['rename_interval']
     log_to_file = args['log_to_file']
     log_level = args['log_level']
+    library_path = args['library_path']
 
     if parse_resolution:
         name_format = 'S{season}E{ep} - {resolution}'
@@ -353,6 +363,8 @@ if os.path.isdir(target_path):
                 logger.info(f'重命名为: {new_name}')
                 if move_up_to_season_folder:
                     new_path = season_path + '/' + new_name
+                    if library_path != "":
+                        new_path = library_path + new_path.removeprefix(target_path)
                     logger.info(f'目标位置: 季文件夹 ({season_path})')
                 else:
                     new_path = parent_folder_path + '/' + new_name
@@ -399,6 +411,8 @@ else:
             logger.info(f'重命名为: {new_name}')
             if move_up_to_season_folder:
                 new_path = format_path(season_path + '/' + new_name)
+                if library_path != "":
+                    new_path = library_path + new_path.removeprefix(target_path)
                 logger.info(f'目标位置: 季文件夹 ({season_path})')
             else:
                 new_path = format_path(parent_folder_path + '/' + new_name)
@@ -535,14 +549,14 @@ for index, (old, new) in enumerate(file_lists, 1):
 
     # 默认遇到文件存在则强制删除已存在文件
     try:
-        # 检测文件能否重命名
+        # 检测文件能否硬链接
         tmp_name = new + '.new'
-        logger.info(f"步骤1: 重命名 {old} -> {tmp_name} (临时文件)")
+        logger.info(f"步骤1: 链接 {old} -> {tmp_name} (临时文件)")
         try:
-            os.rename(old, tmp_name)
-            logger.info(f"✓ 临时重命名成功: {old} -> {tmp_name}")
+            os.link(old, tmp_name)
+            logger.info(f"✓ 临时链接成功: {old} -> {tmp_name}")
         except Exception as e:
-            logger.error(f"临时重命名失败: {old} -> {tmp_name}, 错误: {str(e)}")
+            logger.error(f"临时链接失败: {old} -> {tmp_name}, 错误: {str(e)}")
             raise  # 重新抛出异常，让外层的异常处理捕获
 
         # 目标文件已存在, 先删除
