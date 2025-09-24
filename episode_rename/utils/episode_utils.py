@@ -1,13 +1,13 @@
 import os
 import re
 
-from custom_rules import starts_with_rules
-from utils.config_utils import get_qrm_config
-from utils.ext_utils import get_file_name_ext
-from utils.file_name_utils import zero_fix
-from utils.log_utils import logger
-from utils.path_utils import format_path
-from utils.season_utils import get_season, get_season_cascaded, get_season_path
+from ..custom_rules import starts_with_rules
+from .config_utils import get_qrm_config
+from .ext_utils import get_file_name_ext
+from .file_name_utils import zero_fix
+from .log_utils import logger
+from .path_utils import format_path
+from .season_utils import get_season, get_season_cascaded, get_season_path
 
 
 def ep_format(ep):
@@ -316,7 +316,9 @@ def get_season_and_ep(file_path, ignores, force_rename=0):
         logger.debug(f'分割后的文件名部分: {res}')
 
         # 从括号外内容中提取集数
-        season_from_outside, ep_from_outside = extract_ep_from_outside_brackets(file_name, bracket_pairs, res)
+        season_from_outside, ep_from_outside = extract_ep_from_outside_brackets(
+            file_name, bracket_pairs, res
+        )
         if ep_from_outside:
             ep = ep_from_outside
         if season_from_outside:
@@ -434,7 +436,9 @@ def ep_offset_patch(file_path, ep, application_path):
                             if format_path(x['savePath']) == format_path(season_path):
                                 try:
                                     must_contain_tmp = x['mustContain']
-                                    logger.debug(f'找到匹配的保存路径，mustContain: {must_contain_tmp}')
+                                    logger.debug(
+                                        f'找到匹配的保存路径，mustContain: {must_contain_tmp}'
+                                    )
 
                                     if '|' not in must_contain_tmp:
                                         logger.debug('mustContain不包含多组数据，使用默认index=0')
@@ -444,9 +448,16 @@ def ep_offset_patch(file_path, ep, application_path):
                                             keywords_list = keywords.strip().split(' ')
                                             logger.debug(f'检查第{i+1}组关键词: {keywords_list}')
 
-                                            if all([keyword.strip() in file_path for keyword in keywords_list]):
+                                            if all(
+                                                [
+                                                    keyword.strip() in file_path
+                                                    for keyword in keywords_list
+                                                ]
+                                            ):
                                                 index = i
-                                                logger.debug(f'文件路径匹配第{i+1}组关键词，使用index={index}')
+                                                logger.debug(
+                                                    f'文件路径匹配第{i+1}组关键词，使用index={index}'
+                                                )
                                                 break
                                 except Exception as e:
                                     logger.error(f'解析mustContain时出错: {str(e)}')

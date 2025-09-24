@@ -6,21 +6,21 @@ import sys
 import time
 from datetime import datetime
 
-from custom_rules import starts_with_rules
-from utils.config_utils import get_qrm_config
-from utils.episode_utils import get_season_and_ep, ep_offset_patch, ep_format
-from utils.ext_utils import COMPOUND_EXTS, get_file_name_ext, fix_ext
-from utils.file_name_utils import clean_name, zero_fix, name_format_bypass_check
-from utils.log_utils import logger
-from utils.path_utils import (
+from .custom_rules import starts_with_rules
+from .utils.config_utils import get_qrm_config
+from .utils.episode_utils import ep_format, ep_offset_patch, get_season_and_ep
+from .utils.ext_utils import COMPOUND_EXTS, fix_ext, get_file_name_ext
+from .utils.file_name_utils import clean_name, name_format_bypass_check, zero_fix
+from .utils.log_utils import logger
+from .utils.path_utils import (
+    check_and_delete_redundant_file,
+    delete_empty_dirs,
     format_path,
     get_absolute_path,
-    delete_empty_dirs,
-    check_and_delete_redundant_file,
 )
-from utils.resolution_utils import get_resolution_in_name, resolution_dict
-from utils.season_utils import get_season_cascaded, get_season, get_season_path
-from utils.series_utils import get_series_from_season_path
+from .utils.resolution_utils import get_resolution_in_name, resolution_dict
+from .utils.season_utils import get_season, get_season_cascaded, get_season_path
+from .utils.series_utils import get_series_from_season_path
 
 # print('''
 #     -- 警告 --
@@ -431,7 +431,9 @@ if file_lists:
 # 检查旧的文件数量和新的文件数量是否一致，防止文件被覆盖
 new_set = set([x[1] for x in file_lists])
 if len(new_set) != len(file_lists) and not ignore_file_count_check:
-    logger.warning(f"安全检查: 旧文件数量({len(file_lists)})和新文件数量({len(new_set)})不一致，可能会导致文件被覆盖")
+    logger.warning(
+        f"安全检查: 旧文件数量({len(file_lists)})和新文件数量({len(new_set)})不一致，可能会导致文件被覆盖"
+    )
     new_list = [x[1] for x in file_lists]
     duplicate_files = []
     for file in new_set:
@@ -448,7 +450,9 @@ if len(new_set) != len(file_lists) and not ignore_file_count_check:
     logger.error(f"程序已停止执行，未进行任何文件重命名")
     sys.exit()
 elif len(new_set) != len(file_lists) and ignore_file_count_check:
-    logger.warning(f"安全检查: 旧文件数量({len(file_lists)})和新文件数量({len(new_set)})不一致，可能会导致文件被覆盖")
+    logger.warning(
+        f"安全检查: 旧文件数量({len(file_lists)})和新文件数量({len(new_set)})不一致，可能会导致文件被覆盖"
+    )
     logger.warning(f"已启用忽略检查(--ignore_file_count_check 1)，将继续执行重命名操作")
 
     new_list = [x[1] for x in file_lists]
@@ -475,16 +479,16 @@ for index, (old, new) in enumerate(file_lists, 1):
             logger.debug(f"重命名间隔等待 {rename_interval}秒...")
             time.sleep(rename_interval)
 
-    logger.info(f"[{index}/{len(file_lists)}] 重命名: {os.path.basename(old)} -> {os.path.basename(new)}")
+    logger.info(
+        f"[{index}/{len(file_lists)}] 重命名: {os.path.basename(old)} -> {os.path.basename(new)}"
+    )
 
     if not rename_overwrite:
         # 如果设置不覆盖 遇到已存在的目标文件不强制删除 只记录错误
         if os.path.exists(new):
             error_message = f'重命名失败: 目标文件已存在 - {new}'
             logger.warning(error_message)
-            error_logs.append(
-                f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} {error_message}'
-            )
+            error_logs.append(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} {error_message}')
             continue
 
     # new路径文件如果存在，会导致覆盖操作的时候，优先保留满足第一组匹配规则的文件
@@ -517,7 +521,9 @@ for index, (old, new) in enumerate(file_lists, 1):
             if first_match:
                 file_full_name = os.path.basename(old)
                 if not (first_match.lower() in file_full_name.lower()):
-                    logger.info(f'已存在文件情况下，新文件未满足第一组匹配规则，删除当前文件: {old}')
+                    logger.info(
+                        f'已存在文件情况下，新文件未满足第一组匹配规则，删除当前文件: {old}'
+                    )
                     try:
                         os.remove(old)
                         logger.info(f"✓ 文件删除成功: {old}")
@@ -565,7 +571,9 @@ for index, (old, new) in enumerate(file_lists, 1):
                 logger.error(f"原始文件恢复失败: {tmp_name} -> {old}, 错误: {str(recover_error)}")
             raise  # 重新抛出原始异常，让外层的异常处理捕获
     except Exception as e:
-        error_message = f"重命名失败: {os.path.basename(old)} -> {os.path.basename(new)}, 错误: {str(e)}"
+        error_message = (
+            f"重命名失败: {os.path.basename(old)} -> {os.path.basename(new)}, 错误: {str(e)}"
+        )
         logger.error(error_message)
         error_logs.append(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} {error_message}')
 
