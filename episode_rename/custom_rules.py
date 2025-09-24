@@ -24,4 +24,10 @@ starts_with_rules = [
             r'^\[CASO\&Airota\&LoliHouse\] .* - (.*?) .*',
         ],
     ],
+    [
+        '[LoliHouse]',
+        [
+            r'^\[LoliHouse\] .* - (.*?) .*',
+        ],
+    ],
 ]
