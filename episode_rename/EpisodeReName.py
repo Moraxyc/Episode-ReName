@@ -553,6 +553,7 @@ for index, (old, new) in enumerate(file_lists, 1):
         tmp_name = new + '.new'
         logger.info(f"步骤1: 链接 {old} -> {tmp_name} (临时文件)")
         try:
+            os.makedirs(os.path.dirname(tmp_name), exist_ok=True)
             os.link(old, tmp_name)
             logger.info(f"✓ 临时链接成功: {old} -> {tmp_name}")
         except Exception as e:
